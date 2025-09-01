@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱莎学校国际高中生环境保护跨学科科创项目</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.0/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px 0 rgba(31, 38, 135, 0.2);
+        }
+        .chart-container {
+            height: 320px;
+            width: 100%;
+            position: relative;
+        }
+        .highlight-text {
+            position: relative;
+            display: inline-block;
+        }
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: rgba(99, 102, 241, 0.2);
+            z-index: -1;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .shadow-glow {
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+        }
+        .data-pill {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(99, 102, 241, 0.1);
+            color: #4f46e5;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .mobile-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            margin: 0.5rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transform-origin: top;
+            transform: scaleY(0);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 100;
+        }
+        .mobile-menu.active {
+            transform: scaleY(1);
+            opacity: 1;
+        }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: #e5e7eb;
+            z-index: 1000;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+        }
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 0 2px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 进度条 -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- 导航条 -->
+    <nav class="glassmorphism sticky top-0 z-50 p-4 mb-8" id="mainNav">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                <i class="fas fa-leaf mr-2"></i>爱莎学校环保科创项目
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#overview" class="text-gray-600 hover:text-indigo-600 transition-colors">项目概览</a>
+                <a href="#modules" class="text-gray-600 hover:text-indigo-600 transition-colors">核心模块</a>
+                <a href="#resources" class="text-gray-600 hover:text-indigo-600 transition-colors">资源体系</a>
+                <a href="#plan" class="text-gray-600 hover:text-indigo-600 transition-colors">实施计划</a>
+                <a href="#results" class="text-gray-600 hover:text-indigo-600 transition-colors">预期成果</a>
+            </div>
+            <button class="md:hidden text-gray-600 focus:outline-none" id="mobileMenuButton" aria-label="导航菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- 移动端导航菜单 -->
+            <div class="mobile-menu md:hidden" id="mobileMenu">
+                <a href="#overview" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center">
+                    <i class="fas fa-bullseye mr-3 text-indigo-500"></i>项目概览
+                </a>
+                <a href="#modules" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center">
+                    <i class="fas fa-cubes mr-3 text-indigo-500"></i>核心模块
+                </a>
+                <a href="#resources" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center">
+                    <i class="fas fa-network-wired mr-3 text-indigo-500"></i>资源体系
+                </a>
+                <a href="#plan" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center">
+                    <i class="fas fa-calendar-alt mr-3 text-indigo-500"></i>实施计划
+                </a>
+                <a href="#results" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center">
+                    <i class="fas fa-trophy mr-3 text-indigo-500"></i>预期成果
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部横幅 -->
+    <header class="container mx-auto py-16 px-4 md:px-8 relative">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                爱莎学校国际高中生环境保护跨学科科创项目
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 mb-8">合成生物学与环境保护的创新实践</p>
+            <div class="flex justify-center gap-4 flex-wrap">
+                <div class="stat-card glassmorphism p-4 text-center w-32">
+                    <div class="text-sm text-gray-500">iGEM金奖</div>
+                    <div class="text-2xl font-bold text-indigo-600">106</div>
+                </div>
+                <div class="stat-card glassmorphism p-4 text-center w-32">
+                    <div class="text-sm text-gray-500">覆盖学校</div>
+                    <div class="text-2xl font-bold text-indigo-600">n+</div>
+                </div>
+                <div class="stat-card glassmorphism p-4 text-center w-32">
+                    <div class="text-sm text-gray-500">合作高校</div>
+                    <div class="text-2xl font-bold text-indigo-600">8</div>
+                </div>
+                <div class="stat-card glassmorphism p-4 text-center w-32">
+                    <div class="text-sm text-gray-500">碳减排量</div>
+                    <div class="text-2xl font-bold text-indigo-600">2.87吨</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 搜索框 -->
+    <div class="container mx-auto px-4 md:px-8 mb-8">
+        <div class="glassmorphism p-4">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="搜索项目内容...">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目概览部分 -->
+    <section id="overview" class="container mx-auto py-12 px-4 md:px-8">
+        <div class="glassmorphism p-8 mb-16">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                项目背景与目标
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <p class="mb-4">当前全球环境问题正以复合型危机形态加剧，塑料污染总量已达数十亿吨，多数通过填埋或焚烧处理引发土壤与水源污染；纺织产业每年制造逾1000亿件服装，染色阶段使用的靛蓝素染料成为主要污染源；一次性纸巾滥用导致全球每年3.2亿吨纸张消耗，每分钟36个足球场面积的森林遭砍伐，若全校停用餐巾纸一学年可实现碳减量2.87吨。</p>
+                    <p class="mb-4">与此同时，公众对气候变化的 exists"高风险低认知"的矛盾——地球生态系统已发生深刻变化并影响经济社会各领域，但尚未形成广泛共识与行动支持。在此背景下，青少年作为应对环境挑战的未来主力军，急需系统性培养科研创新能力与社会责任感。</p>
+                    
+                    <div class="my-6">
+                        <h4 class="font-semibold text-lg mb-3 text-gray-700">项目三维培养目标：</h4>
+                        <div class="flex flex-wrap">
+                            <div class="data-pill"><i class="fas fa-flask mr-1"></i> 科研维度</div>
+                            <div class="data-pill"><i class="fas fa-users mr-1"></i> 社会维度</div>
+                            <div class="data-pill"><i class="fas fa-globe mr-1"></i> 国际维度</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mermaid">
+                        pie
+                            title 2024年iGEM中国队伍奖项分布
+                            "金牌" : 106
+                            "银牌" : 77
+                            "铜牌" : 15
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-2xl font-semibold mb-4">三维目标评估体系</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-2"><i class="fas fa-flask mr-2"></i>科研维度</h4>
+                        <p class="text-sm text-gray-700">以iGEM参赛成果（奖项等级、论文发表）及实验数据 reproducibility 为核心指标</p>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 mb-2"><i class="fas fa-users mr-2"></i>社会维度</h4>
+                        <p class="text-sm text-gray-700">通过社区服务时长、科普平台访问量、媒体报道频次量化评估</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 mb-2"><i class="fas fa-globe mr-2"></i>国际维度</h4>
+                        <p class="text-sm text-gray-700">依据跨国合作项目数量、国际会议发言次数、海外团队互评结果进行考核</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心模块部分 -->
+    <section id="modules" class="container mx-auto py-12 px-4 md:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">核心模块设计</h2>
+
+        <div class="grid grid-cols-1 gap-8 mb-16">
+            <div class="glassmorphism p-8 card-hover">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold">iGEM/iDEC项目孵化模块</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2 text-gray-700">课题方向</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                            <li>微塑料污染治理：针对珠江口海域微塑料富集问题</li>
+                            <li>生态修复：红树林生态退化与珊瑚白化问题</li>
+                            <li>环境监测：开发基于合成生物学传感器的水质监测系统</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2 text-gray-700">团队建设</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                            <li>成员需覆盖生物学、环境科学、计算机科学等领域</li>
+                            <li>设湿实验组、干实验组、Human Practices组</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">安全合规要点</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="bg-indigo-50 rounded-lg p-3">
+                            <p class="text-sm text-indigo-700"><i class="fas fa-check-circle mr-1"></i> 实验材料：仅使用iGEM白名单内微生物</p>
+                        </div>
+                        <div class="bg-indigo-50 rounded-lg p-3">
+                            <p class="text-sm text-indigo-700"><i class="fas fa-check-circle mr-1"></i> 人员资质：通过iGEM安全培训及考试</p>
+                        </div>
+                        <div class="bg-indigo-50 rounded-lg p-3">
+                            <p class="text-sm text-indigo-700"><i class="fas fa-check-circle mr-1"></i> 操作规范：基因克隆需在二级生物安全柜内进行</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glassmorphism p-8 card-hover">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold">Wet Lab湿实验模块</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-blue-50 rounded-xl p-4">
+                        <div class="text-blue-600 text-xl mb-2"><i class="fas fa-graduation-cap mr-2"></i>基础训练</div>
+                        <p class="text-sm text-gray-600">分子克隆、蛋白工程、定向进化等核心技术框架</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-4">
+                        <div class="text-purple-600 text-xl mb-2"><i class="fas fa-chart-line mr-2"></i>进阶实验</div>
+                        <p class="text-sm text-gray-600">定向进化与多模块功能系统设计</p>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4">
+                        <div class="text-green-600 text-xl mb-2"><i class="fas fa-microscope mr-2"></i>案例复刻</div>
+                        <p class="text-sm text-gray-600">微生物纤维素生产与应用</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">核心技术清单</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <div class="data-pill"><i class="fas fa-dna mr-1"></i> 分子克隆</div>
+                        <div class="data-pill"><i class="fas fa-random mr-1"></i> 定向进化</div>
+                        <div class="data-pill"><i class="fas fa-check-circle mr-1"></i> 功能验证</div>
+                        <div class="data-pill"><i class="fas fa-shield-alt mr-1"></i> 安全规范</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glassmorphism p-8 card-hover">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold">Dry Lab数据建模模块</h3>
+                </div>
+                
+                <div class="mermaid">
+                    graph LR
+                        A[数据获取] --> B[模型构建]
+                        B --> C[可视化呈现]
+                        A --> D[NCBI数据库]
+                        A --> E[珠江水质数据]
+                        B --> F[机器学习预测]
+                        B --> G[数学建模优化]
+                        C --> H[Python matplotlib]
+                        C --> I[Tableau]
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">核心工具与资源</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="font-medium text-gray-700"><i class="fas fa-database mr-2 text-blue-500"></i>数据获取</p>
+                            <p class="text-sm text-gray-600">NCBI（基因序列）、BioCRF(GZ)（多组学数据）、珠江水质公开数据集</p>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700"><i class="fas fa-project-diagram mr-2 text-purple-500"></i>模型构建</p>
+                            <p class="text-sm text-gray-600">LSTM-GCN（功能肽筛选）、Prometheus（元件检索）、DBTL闭环</p>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700"><i class="fas fa-chart-bar mr-2 text-green-500"></i>可视化工具</p>
+                            <p class="text-sm text-gray-600">Python matplotlib（基础图表）、Tableau（交互式展示）</p>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-700"><i class="fas fa-graduation-cap mr-2 text-indigo-500"></i>技能培养</p>
+                            <p class="text-sm text-gray-600">港科大SISP 1108课程（Python数据科学）、iGEM竞赛建模实践</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glassmorphism p-8 card-hover">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold">Human Practices社会学调研模块</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-pink-50 rounded-xl p-4">
+                        <div class="text-pink-600 text-xl mb-2"><i class="fas fa-search mr-2"></i>问题诊断</div>
+                        <p class="text-sm text-gray-600">环境认知调研体系构建</p>
+                    </div>
+                    <div class="bg-yellow-50 rounded-xl p-4">
+                        <div class="text-yellow-600 text-xl mb-2"><i class="fas fa-hands-helping mr-2"></i>干预设计</div>
+                        <p class="text-sm text-gray-600">NGO协同的多元科普实践</p>
+                    </div>
+                    <div class="bg-teal-50 rounded-xl p-4">
+                        <div class="text-teal-600 text-xl mb-2"><i class="fas fa-chart-pie mr-2"></i>效果评估</div>
+                        <p class="text-sm text-gray-600">量化与质性结合的多维验证</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">伦理审查要点</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="bg-red-50 rounded-lg p-3">
+                            <p class="text-sm text-red-700"><i class="fas fa-clipboard-check mr-1"></i> 问卷调研：提交人类实践项目伦理申请表</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3">
+                            <p class="text-sm text-red-700"><i class="fas fa-tree mr-1"></i> 户外采样：完成环境释放风险评估报告</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3">
+                            <p class="text-sm text-red-700"><i class="fas fa-lock mr-1"></i> 数据管理：签署数据隐私保护协议</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 资源整合体系部分 -->
+    <section id="resources" class="container mx-auto py-12 px-4 md:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">资源整合体系</h2>
+        
+        <div class="glassmorphism p-8 mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">高校合作网络</h3>
+            </div>
+            
+            <div class="mermaid">
+                graph TD
+                    A[香港科技大学] --> B[李嘉诚合成生物学研究院]
+                    A --> C[暑期学院SISP 1108课程]
+                    D[中山大学] --> E[植物合成生物学联合实验室]
+                    F[澳门大学] --> G[中医药合成生物学联合实验室]
+                    H[深圳理工大学] --> I[合成生物大设施]
+            </div>
+            
+            <div class="mt-6">
+                <h4 class="font-semibold text-lg mb-2 text-gray-700">合作高校申请关键时间节点</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-2 px-4 text-left">高校</th>
+                                <th class="py-2 px-4 text-left">课程名称</th>
+                                <th class="py-2 px-4 text-left">申请时间</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-2 px-4">香港科技大学</td>
+                                <td class="py-2 px-4">数据科学与Python</td>
+                                <td class="py-2 px-4">3月开放，5月截止</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">中山大学</td>
+                                <td class="py-2 px-4">合成生物学导论</td>
+                                <td class="py-2 px-4">4月申请，6月截止</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">澳门大学</td>
+                                <td class="py-2 px-4">微生物生态学</td>
+                                <td class="py-2 px-4">3-5月申请</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glassmorphism p-8 mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">产业与学术交流平台</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">学术交流</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>iGEM竞赛：全球最大的合成生物学竞赛</li>
+                        <li>CCiC大会：中国生物基因工程机器交流大会</li>
+                        <li>iGBA联盟：大湾区合成生物学产学研论坛</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">产业实践</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>汤臣倍健透明工厂参访</li>
+                        <li>深圳能源垃圾焚烧发电厂调研</li>
+                        <li>深圳市工程生物学产业创新中心</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <h4 class="font-semibold text-lg mb-2 text-gray-700">2025年产业活动日历</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-2 px-4 text-left">时间</th>
+                                <th class="py-2 px-4 text-left">活动名称</th>
+                                <th class="py-2 px-4 text-left">地点</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-2 px-4">3月</td>
+                                <td class="py-2 px-4">深圳合成生物产业创新联盟青少年创新论坛</td>
+                                <td class="py-2 px-4">深圳光明区</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">7月</td>
+                                <td class="py-2 px-4">iGBA大湾区合成生物学产学研论坛</td>
+                                <td class="py-2 px-4">珠海</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">8月</td>
+                                <td class="py-2 px-4">CCiC中国区iGEM团队交流会</td>
+                                <td class="py-2 px-4">北京</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">9月</td>
+                                <td class="py-2 px-4">深圳光明科学城合成生物开放日</td>
+                                <td class="py-2 px-4">深圳光明区</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 实施计划部分 -->
+    <section id="plan" class="container mx-auto py-12 px-4 md:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">项目实施计划</h2>
+        
+        <div class="glassmorphism p-8 mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">时间规划</h3>
+            </div>
+            
+            <div class="mermaid">
+                gantt
+                    title 项目实施时间轴
+                    dateFormat  YYYY-MM-DD
+                    section 筹备期
+                    团队组建与基础准备       :a1, 2025-11-01, 120d
+                    section 学术期
+                    模块培训               :a2, after a1, 60d
+                    课题立项               :a3, after a2, 30d
+                    实验实施               :a4, after a3, 90d
+                    section 竞赛期
+                    成果凝练与国际展示       :a5, after a4, 90d
+                    section 转化期
+                    成果落地与社会价值实现   :a6, after a5, 30d
+            </div>
+            
+            <div class="mt-6">
+                <h4 class="font-semibold text-lg mb-2 text-gray-700">关键时间节点提示</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <p class="font-medium text-blue-800"><i class="fas fa-calendar-check mr-2"></i>iGEM注册</p>
+                        <p class="text-sm text-gray-700">2月15日（早鸟价截止）、5月31日（最终注册截止）</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <p class="font-medium text-purple-800"><i class="fas fa-flask mr-2"></i>实验周期</p>
+                        <p class="text-sm text-gray-700">7-8月为核心实验窗口期，需提前1个月完成高校实验室预约</p>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <p class="font-medium text-green-800"><i class="fas fa-laptop-code mr-2"></i>竞赛提交</p>
+                        <p class="text-sm text-gray-700">Wiki与视频需在iGEM官方 freeze日期前完成</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glassmorphism p-8 mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">风险控制体系</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">安全风险防控</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>全员完成iGEM官方安全课程</li>
+                        <li>严格执行iGEM安全表单制度</li>
+                        <li>建立"学生自查→导师审核→高校PI把关"三级审核制度</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">技术风险应对</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>预实验验证+多方案备选策略</li>
+                        <li>关键实验设置备份方案</li>
+                        <li>建立实验数据备份制度与重复验证机制</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <h4 class="font-semibold text-lg mb-2 text-gray-700">风险控制核心要点</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="bg-red-50 rounded-lg p-3">
+                        <p class="text-sm text-red-700"><i class="fas fa-shield-alt mr-1"></i> 安全底线</p>
+                    </div>
+                    <div class="bg-yellow-50 rounded-lg p-3">
+                        <p class="text-sm text-yellow-700"><i class="fas fa-cogs mr-1"></i> 技术韧性</p>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-3">
+                        <p class="text-sm text-blue-700"><i class="fas fa-project-diagram mr-1"></i> 进度保障</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-3">
+                        <p class="text-sm text-purple-700"><i class="fas fa-balance-scale mr-1"></i> 伦理红线</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 预期成果部分 -->
+    <section id="results" class="container mx-auto py-12 px-4 md:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">预期成果与保障</h2>
+        
+        <div class="glassmorphism p-8 mb-16">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">预期成果</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h4 class="font-semibold text-xl mb-3 text-blue-800"><i class="fas fa-flask mr-2"></i>学术成果</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li>iGEM高中组金奖</li>
+                        <li>完成包含实验数据的WIKI网站</li>
+                        <li>发表科普论文《合成生物学在青少年环保中的应用》</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 rounded-xl p-6">
+                    <h4 class="font-semibold text-xl mb-3 text-green-800"><i class="fas fa-users mr-2"></i>社会成果</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li>开展3场社区科普活动，覆盖1000+公众</li>
+                        <li>对接汤臣倍健等大湾区企业</li>
+                        <li>形成可推广的环境保护方案</li>
+                    </ul>
+                </div>
+                <div class="bg-purple-50 rounded-xl p-6">
+                    <h4 class="font-semibold text-xl mb-3 text-purple-800"><i class="fas fa-user-graduate mr-2"></i>个人成果</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li>80%队员掌握核心技术</li>
+                        <li>50%获高校推荐信</li>
+                        <li>升学数据对标QS前30录取率</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 删除图表容器 -->
+        </div>
+        
+        <div class="glassmorphism p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-4 shadow-glow">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-2xl font-semibold">资源保障</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">硬件资源</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>香港科技大学生物科学中央实验室</li>
+                        <li>深圳合成生物研究重大科技基础设施</li>
+                        <li>深圳市工程生物学产业创新中心</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-2 text-gray-700">资金保障</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                        <li>竞赛专项支持</li>
+                        <li>政府与基金会资助</li>
+                        <li>企业与社会资源</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <h4 class="font-semibold text-lg mb-2 text-gray-700">导师团队核心分工</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-2 px-4 text-left">角色</th>
+                                <th class="py-2 px-4 text-left">职责范围</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-2 px-4">高校PI</td>
+                                <td class="py-2 px-4">整体管理、安全认证、财务责任</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">企业导师</td>
+                                <td class="py-2 px-4">技术指导、资源对接</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">往届队员</td>
+                                <td class="py-2 px-4">竞赛经验分享、团队协作指导</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-100 py-8 mt-16">
+        <div class="container mx-auto px-4 md:px-8 text-center text-gray-600">
+            <p>created by inteleap</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化Mermaid图表
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+                // 点击导航链接后关闭移动端菜单
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                    // 同时切换图标回汉堡按钮
+                    const menuIcon = document.querySelector('#mobileMenuButton i');
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                }
+            });
+        });
+
+        // 移动端导航菜单切换
+        const menuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+
+            // 切换图标
+            const icon = this.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // 点击页面其他区域关闭移动端菜单
+        document.addEventListener('click', function(event) {
+            const isClickInsideNav = document.getElementById('mainNav').contains(event.target);
+
+            if (!isClickInsideNav && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                const icon = menuButton.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // 滚动进度条
+        window.addEventListener('scroll', function() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollProgress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progressBar').style.width = scrollProgress + '%';
+            
+            // 显示/隐藏返回顶部按钮
+            const backToTop = document.getElementById('backToTop');
+            if (scrollTop > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // 返回顶部
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm.length < 2) {
+                // 清除所有高亮
+                document.querySelectorAll('.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                return;
+            }
+            
+            // 搜索页面内容
+            const contentElements = document.querySelectorAll('section p, section li, section h2, section h3, section h4');
+            let found = false;
+            
+            contentElements.forEach(el => {
+                const text = el.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    found = true;
+                    
+                    // 高亮显示匹配的文本
+                    const regex = new RegExp(searchTerm, 'gi');
+                    const newText = el.innerHTML.replace(regex, match => 
+                        `<span class="highlight">${match}</span>`
+                    );
+                    el.innerHTML = newText;
+                    
+                    // 滚动到第一个匹配项
+                    if (!found) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                }
+            });
+            
+            if (!found && searchTerm.length > 0) {
+                alert('未找到匹配的内容');
+            }
+        });
+
+        // 删除resultsChart相关的初始化代码
+    </script>
+</body>
+</html>
